@@ -1,20 +1,14 @@
 import fs from "fs";
 import path from "path";
 import _ from 'lodash'
-import {fileURLToPath} from "url";
 
 function debug(...args) {
     console.log(...args)
 }
 
-const __filename = fileURLToPath(import.meta.url);
-
-const __dirname = path.dirname(__filename);
-
 const input = fs.readFileSync(path.join(__dirname, 'input.txt')).toString();
 
 const lines = input.split('\n');
-lines.pop()
 
 function isSpecialChar(char: string) {
     if (char.length > 1) {

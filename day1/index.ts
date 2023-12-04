@@ -16,7 +16,6 @@ const NUMBER_MAPPING: any = {
 const input = fs.readFileSync(path.join(__dirname, 'input.txt')).toString();
 
 const lines = input.split('\n');
-lines.pop()
 
 const result = lines.map((line: string) => {
     for (const n in NUMBER_MAPPING) {

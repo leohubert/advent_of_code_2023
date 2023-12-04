@@ -1,15 +1,9 @@
-import {fileURLToPath} from "url";
 import path from "path";
 import fs from "fs";
-
-const __filename = fileURLToPath(import.meta.url);
-
-const __dirname = path.dirname(__filename);
 
 const input = fs.readFileSync(path.join(__dirname, 'input.txt')).toString();
 
 const lines = input.split('\n');
-lines.pop()
 
 let total = 0
 for (const line of lines) {

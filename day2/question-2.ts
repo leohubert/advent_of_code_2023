@@ -15,7 +15,6 @@ const MAX_CUBES = {
 const input = fs.readFileSync(path.join(__dirname, 'input.txt')).toString();
 
 const lines = input.split('\n');
-lines.pop()
 
 let total=  0
 for (const line of lines) {
