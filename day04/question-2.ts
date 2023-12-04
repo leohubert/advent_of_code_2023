@@ -4,8 +4,6 @@ import fs from "fs";
 const input = fs.readFileSync(path.join(__dirname, 'input.txt')).toString();
 
 let lines = input.split('\n');
-lines.pop()
-
 
 function extractWinners(line: string) {
     const [card, gameLine] = line.split(':')

@@ -1,0 +1,7 @@
+#!/bin/bash
+question_number=${1:-1}
+day=${2:-$(date +%d)}
+command="ts-node ./day${day}/question-${question_number}.ts"
+echo running... ${command}
+
+${command}
