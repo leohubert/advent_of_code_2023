@@ -12,10 +12,9 @@ const seeds = _.chunk(lines.shift()
     .trim()
     .split(' ')
     .map(Number), 2)
+    .sort((a, b) => a[0] - b[0])
 
-
-
-type Concerter = {destinationStart: number, destinationEnd: number, sourceStart: number, sourceEnd: number, count: number}
+type Concerter = {destinationStart: number, destinationEnd: number, sourceStart: number, sourceEnd: number}
 
 let maps: {[map: string]: Concerter[]} = {}
 
@@ -40,41 +39,60 @@ for (const line of lines) {
         destinationEnd: destinationRange + count,
         sourceStart: sourceRange,
         sourceEnd: sourceRange + count,
-        count: count,
     })
 
 }
 
-let lowerstNumber: number
-for (const seedRange of seeds) {
-    const [seedInital, count] = seedRange
-    const seedMax= seedInital + count
-    for (let i = seedInital; i <= seedMax ; i++) {
-        let seedValue = i
-        for (const [map, converters] of Object.entries(maps)) {
-            seedValue = sourceToDestination(seedValue, converters)
-        }
-        if (!lowerstNumber || seedValue <= lowerstNumber) {
-            lowerstNumber = seedValue
-        }
-    }
-
-}
-
-console.log(lowerstNumber)
 
 function sourceToDestination(sourceNumber: number, converters: Concerter[]): number {
     for (const converter of converters) {
         if (sourceNumber >= converter.sourceStart && sourceNumber <= converter.sourceEnd) {
-            // console.log(sourceNumber, converter)
             const diffInCount = sourceNumber - converter.sourceStart
-            const result = converter.destinationStart + diffInCount
-            // console.log({
-            //     diffInCount,
-            //     result
-            // })
-            return result
+            return converter.destinationStart + diffInCount
         }
     }
     return sourceNumber
 }
+
+function computeSeedPosition(seed: number) {
+    let seedValue = seed
+    for (const [map, converters] of Object.entries(maps)) {
+        seedValue = sourceToDestination(seedValue, converters)
+    }
+    return seedValue
+}
+
+const seedsToSoil = maps['seed-to-soil']
+    // sort by lower sourceStart to optimize the code
+    .sort((a, b) => a.sourceStart - b.sourceStart)
+
+let lowerstNumber: number
+for (const seedRange of seeds) {
+    let [seedInitialValue, range] = seedRange
+    const minSeedValue = seedInitialValue
+    const maxSeedValue = seedInitialValue + range
+
+    for (const seedToSoil of seedsToSoil) {
+        const overlap = Math.min(seedToSoil.sourceEnd, maxSeedValue) - Math.max(seedToSoil.sourceStart, minSeedValue)
+        if (overlap > 0) {
+            let overLapStart = minSeedValue >= seedToSoil.sourceStart ? minSeedValue : seedToSoil.sourceStart;
+            let overLapEnd = maxSeedValue <= seedToSoil.sourceEnd ? maxSeedValue : seedToSoil.sourceEnd;
+
+            console.log(`Testing ${overLapStart} to ${overLapEnd}`)
+
+            for(let seed = overLapStart; seed <= overLapEnd; seed++) {
+                const seedValue = computeSeedPosition(seed)
+                if(!lowerstNumber || seedValue < lowerstNumber) {
+                    lowerstNumber = seedValue;
+                }
+            }
+
+            // because seedsToSoil are sorted by lowest values before,
+            // we can stop the code for this seed
+            break;
+        }
+    }
+
+}
+
+console.log('Min position: ', lowerstNumber)

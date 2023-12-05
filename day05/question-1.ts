@@ -1,6 +1,5 @@
 import fs from "fs";
 import path from "path";
-import _, {map} from "lodash";
 
 const input = fs.readFileSync(path.join(__dirname, 'input.txt')).toString();
 
@@ -44,49 +43,33 @@ for (const line of lines) {
 
 }
 
-let lowerstNumber: number
-for (const seed of seeds) {
-    let seedValue = seed
-    console.log('start', seedValue)
-    for (const [map, converters] of Object.entries(maps)) {
-        seedValue = sourceToDestination(seedValue, converters)
-    }
-    if (!lowerstNumber || seedValue <= lowerstNumber) {
-        lowerstNumber = seedValue
-    }
-}
-
-
-console.log(lowerstNumber)
-
-//
-// for (const [map, converters] of Object.entries(maps)) {
-//     let newNumbers = []
-//
-//     console.log('map', map)
-//
-//     for (const seed of seeds) {
-//         newNumbers.push(sourceToDestination(seed, converters))
-//     }
-//
-//     console.log(newNumbers)
-//
-//     numbers = newNumbers
-// }
-
-
 function sourceToDestination(sourceNumber: number, converters: Concerter[]): number {
     for (const converter of converters) {
         if (sourceNumber >= converter.sourceStart && sourceNumber <= converter.sourceEnd) {
-            // console.log(sourceNumber, converter)
             const diffInCount = sourceNumber - converter.sourceStart
-            const result = converter.destinationStart + diffInCount
-            // console.log({
-            //     diffInCount,
-            //     result
-            // })
-            return result
+            return converter.destinationStart + diffInCount
         }
     }
     return sourceNumber
 }
+
+function computeSeedPosition(seed: number) {
+    let seedValue = seed
+    for (const [map, converters] of Object.entries(maps)) {
+        seedValue = sourceToDestination(seedValue, converters)
+    }
+    return seedValue
+}
+
+let lowestNumber: number
+for (const seed of seeds) {
+    const seedValue = computeSeedPosition(seed)
+
+    if (!lowestNumber || seedValue <= lowestNumber) {
+        lowestNumber = seedValue
+    }
+}
+
+
+
+console.log('Min position:', lowestNumber)
