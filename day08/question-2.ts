@@ -1,6 +1,6 @@
 import fs from "fs";
 import path from "path";
-import _ from "lodash";
+import * as math from 'mathjs'
 
 const input = fs.readFileSync(path.join(__dirname, 'input.txt')).toString();
 
@@ -10,8 +10,6 @@ const instructions = lines.shift().split('')
 
 const map: {[key: string]: [string, string]} = {}
 
-let firstMapPosition = null
-
 // INI MAP
 for (const line of lines) {
     if (line.trim() === '') {
@@ -20,42 +18,41 @@ for (const line of lines) {
     const [position, pathsRaw ] = line.split(' = ')
     const [pathL, pathR] = pathsRaw.slice(1, pathsRaw.length - 1).split(',')
     map[position.trim()] = [pathL.trim(), pathR.trim()]
-
-    if (!firstMapPosition) {
-        firstMapPosition = position
-    }
 }
 
 // RUN GAME
-
 const startingPaths = Object.keys(map).filter(position => position.endsWith('A'))
-console.log(startingPaths)
 
-let currentPositions = [startingPaths[0], startingPaths[1], startingPaths[2], startingPaths[3]]
-let steps = 0
-let instructionIndex = 0
-while (true) {
-    if (_.every(currentPositions, path => path.endsWith('Z') )) {
-        break;
-    }
+function calculSteps(startingPostion: string) {
+    let currentPosition = startingPostion
+    let steps = 0
+    let instructionIndex = 0
+    while (true) {
+        if (currentPosition.endsWith('Z')) {
+            break;
+        }
 
-    const instruction = instructions[instructionIndex++]
-    if (instructionIndex >= instructions.length) {
-        instructionIndex = 0
-    }
-    for (const [index, currentPosition] of currentPositions.entries()) {
+        const instruction = instructions[instructionIndex++]
+        if (instructionIndex >= instructions.length) {
+            instructionIndex = 0
+        }
         let nextPosition: string
         if (instruction === 'L') {
             nextPosition = map[currentPosition][0]
         } else {
             nextPosition = map[currentPosition][1]
         }
-        currentPositions[index] = nextPosition
-    }
+        currentPosition = nextPosition
 
-    steps++
+        steps++
+    }
+    return steps
 }
 
+let stepsForPaths = startingPaths.map(calculSteps)
+// @ts-ignore
+const steps = math.lcm(...stepsForPaths)
 
-console.log(steps)
+console.log('steps', steps)
+
 
