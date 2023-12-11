@@ -3,7 +3,7 @@ import path from "path";
 import _ from "lodash";
 import * as turf from "@turf/turf";
 
-const input = fs.readFileSync(path.join(__dirname, 'input-test.txt')).toString();
+const input = fs.readFileSync(path.join(__dirname, 'input.txt')).toString();
 
 const maze = input.split('\n');
 const emptyMaze = maze.map(line => line.replace(/[^ ]/g, '.'))
