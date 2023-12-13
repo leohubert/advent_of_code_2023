@@ -13,12 +13,21 @@ const games: Game[] = []
 for (const line of lines ) {
     const [board, numbers] = line.split(' ')
 
+    let newNumber = numbers.split(',').map(Number)
+
     games.push({
-        board,
-        numbers: numbers.split(',').map(Number)
+        board:[board, board, board, board, board].join('?'),
+        numbers: [...newNumber, ...newNumber, ...newNumber, ...newNumber, ...newNumber]
     })
 
+    // games.push({
+    //     board,
+    //     numbers: newNumber
+    // })
+
 }
+
+console.log(games.length)
 
 function assertIsPossible(board: string, numbers: number[]) {
     if (board.indexOf('?') !== -1) {
@@ -31,55 +40,39 @@ function assertIsPossible(board: string, numbers: number[]) {
     return _.isEqual(cleanedBoardNumbers, numbers)
 }
 
-function countArrangements(board: string, numbers: number[], parent: any = null) {
+function countArrangements(board: string, numbers: number[]) {
     const boardAsArray = Array.from(board)
-    let node = {
-        parent,
-        current: board,
-        children: []
-    }
+    let total = 0
     for (const [index, char] of boardAsArray.entries()) {
         if (char == '?') {
             const withDot = _.cloneDeep(boardAsArray)
             withDot[index] = '.'
-            node.children.push(countArrangements(withDot.join(''), numbers, node))
+            total += countArrangements(withDot.join(''), numbers)
 
 
             const withDiaz = _.cloneDeep(boardAsArray)
             withDiaz[index] = '#'
-            node.children.push(countArrangements(withDiaz.join(''), numbers, node))
+            total += countArrangements(withDiaz.join(''), numbers)
             break
         }
     }
 
-    return node
-}
 
+    if (assertIsPossible(board, numbers)) {
+        return total + 1
+    }
+
+    return total
+}
 
 let total = 0
 for(const game of games) {
+    console.time(`staring-${game.board}`)
     // console.log(game.board, countArrangements(game.board, game.numbers));  // 4
-    let currentNodes= [countArrangements(game.board, game.numbers)]
-    while (true) {
-        if (!currentNodes.length) {
-            break
-        }
+     total += countArrangements(game.board, game.numbers)
 
-        let newCurrentNodes = []
-        for (const node of currentNodes) {
-            if (!node.children.length) {
-                if (assertIsPossible(node.current, game.numbers)) {
-                    total++
-                }
-            }
-
-            newCurrentNodes.push(...node.children)
-
-        }
-
-        currentNodes = newCurrentNodes
-
-    }
+    console.timeEnd(`staring-${game.board}`)
+    // break
 }
 
 
