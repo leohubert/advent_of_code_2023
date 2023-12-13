@@ -1,0 +1,11 @@
+#!/bin/bash
+question_number=${1:-1}
+day=${2:-$(date +%d)}
+command="cp -n ./template.ts ./day${day}/question-${question_number}.ts"
+echo running... ${command}
+
+mkdir -p "./day${day}"
+touch "./day${day}/input-test.txt"
+touch "./day${day}/input.txt"
+
+${command}

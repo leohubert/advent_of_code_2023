@@ -2,7 +2,7 @@ import fs from "fs";
 import path from "path";
 import _ from "lodash";
 
-const input = fs.readFileSync(path.join(__dirname, 'input.txt')).toString();
+const input = fs.readFileSync(path.join(__dirname, 'input-test.txt')).toString();
 
 const lines = input.split('\n');
 
@@ -15,15 +15,15 @@ for (const line of lines ) {
 
     let newNumber = numbers.split(',').map(Number)
 
-    games.push({
-        board:[board, board, board, board, board].join('?'),
-        numbers: [...newNumber, ...newNumber, ...newNumber, ...newNumber, ...newNumber]
-    })
-
     // games.push({
-    //     board,
-    //     numbers: newNumber
+    //     board:[board, board, board, board, board].join('?'),
+    //     numbers: [...newNumber, ...newNumber, ...newNumber, ...newNumber, ...newNumber]
     // })
+
+    games.push({
+        board,
+        numbers: newNumber
+    })
 
 }
 
