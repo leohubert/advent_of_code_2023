@@ -1,7 +1,8 @@
 import fs from "fs";
 import path from "path";
+import _ from "lodash";
 
-const input = fs.readFileSync(path.join(__dirname, 'input.txt')).toString();
+const input = fs.readFileSync(path.join(__dirname, 'input-test.txt')).toString();
 
 const lines = input.split('\n');
 
@@ -88,7 +89,7 @@ function countMirrorSize(board: string[], position: {position: number, axis: str
     }
 }
 
-function findMirrorPosition(board: string[]) {
+function findMirrorPosition(board: string[], before: any = {}) {
 
     let yPosition = null
     // findind Y
@@ -99,7 +100,11 @@ function findMirrorPosition(board: string[]) {
                 position: y - 1,
                 axis: 'y'
             })
-            if (mirrorSize[0] === 0 || mirrorSize[1] === board.length - 1) {
+            if ((mirrorSize[0] === 0 || mirrorSize[1] === board.length - 1) && !_.isEqual(before, {
+                position: y,
+                size: mirrorSize,
+                axis: 'y'
+            })) {
                 yPosition = {
                     position: y,
                     size: mirrorSize,
@@ -126,7 +131,11 @@ function findMirrorPosition(board: string[]) {
                 position: x - 1,
                 axis: 'x'
             })
-            if (mirrorSize[0] === 0 || mirrorSize[1] === board[0].length - 1) {
+            if ((mirrorSize[0] === 0 || mirrorSize[1] === board[0].length - 1) && !_.isEqual(before, {
+                position: x ,
+                size: mirrorSize,
+                axis: 'x'
+            })) {
                 xPosition = {
                     position: x ,
                     size: mirrorSize,
@@ -139,8 +148,6 @@ function findMirrorPosition(board: string[]) {
     }
 
     if (yPosition && xPosition) {
-        console.log(yPosition, xPosition)
-        console.log(yPosition.size[0], yPosition.size[1], board.length - 1)
         if (yPosition.size[0] === 0 || yPosition.size[1] === board.length - 1) {
             console.log('choose ==> y')
             return yPosition
@@ -159,7 +166,29 @@ let xAxis = 0
 let yAxis = 0
 
 for (const board of boards) {
-    const position = findMirrorPosition(board.board)
+    let position = findMirrorPosition(board.board)
+    const initialPosition = _.cloneDeep(position)
+
+    for(let y = 0; y < board.board.length; y++) {
+        const line = board.board[y]
+        for (let x = 0; x < line.length; x++) {
+            const newLine = Array.from(board.board[y])
+            newLine[x] = (newLine[x] === '.' ? '#' : '.')
+            const newBoard = [
+                    ...board.board.slice(0, x),
+                    newLine.join(''),
+                ...board.board.slice(x + 1)
+            ]
+
+            let newPosition = findMirrorPosition(newBoard, initialPosition)
+            if (newPosition) {
+                console.log('updated', position, newPosition)
+                position = newPosition
+            }
+        }
+    }
+
+    console.log(position)
 
     if (position.axis === 'x') {
         xAxis += position.position
